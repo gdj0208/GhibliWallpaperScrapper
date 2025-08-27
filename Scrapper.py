@@ -23,12 +23,16 @@ class Scrapper:
 
         self.urls[title] = URLS[title]
         # 영화 제목을 기준으로 폴더 생성
-        os.makedirs(os.path.join(self.save_folder, title), exist_ok=True)
-        print(f"✅ '{title}' URL이 추가되었고, 폴더가 생성되었습니다.")
+        # os.makedirs(os.path.join(self.save_folder, title), exist_ok=True)
+        # print(f"✅ '{title}' URL이 추가되었고, 폴더가 생성되었습니다.")
 
 
     # 웹사이트에서 이미지 스크랩
     def scrap_all_image(self, title, url):
+
+        os.makedirs(os.path.join(self.save_folder, title), exist_ok=True)
+        print(f"✅ '{title}' URL이 추가되었고, 폴더가 생성되었습니다.")
+
         response = requests.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         #print(soup.prettify())
@@ -55,17 +59,25 @@ class Scrapper:
                     print(f'❌ 오류: {img_url} - {e}')
             
     # 모든 웹사이트에서 이미지 스크랩
-    def scrap_all_page(self):
+    def scrap_all_page(self, movie_list):
         cnt = 0
 
         print("웹사이트에서 이미지 스크랩을 시작합니다.")
         print(f'스크랩 완료 후 {self.save_folder} 폴더를 확인하세요.')
         print("지브리 월페이퍼들을 다운로드 받는 중입니다...")
 
-        for title, url in self.urls.items():
-            self.scrap_all_image(title, url)
-            cnt += 1
-            print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
+        if movie_list is not None :
+            self.urls = movie_list
+            for title, url in movie_list:
+                self.scrap_all_image(title, url)
+                cnt += 1
+                print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
+        else :
+            for title, url in self.urls.items():
+                print(title, url)
+                self.scrap_all_image(title, url)
+                cnt += 1
+                print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
 
         print("스크랩 완료!")
 
