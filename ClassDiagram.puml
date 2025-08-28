@@ -1,0 +1,13 @@
+@startuml
+
+actor 유저 as user
+
+box "program"
+participant app
+participant Scrapper
+participant unwrapper
+end box
+
+app -> app : initUI
+
+@enduml

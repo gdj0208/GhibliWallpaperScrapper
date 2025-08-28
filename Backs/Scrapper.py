@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 import requests, json, os
-from unwrapper import unwrap_json
+from Backs.unwrapper import unwrap_json
 
 
-URLS = unwrap_json('movie_urls.json') 
-MOVIE_LIST = unwrap_json('movie_data.json')
+# URLS = unwrap_json('data/movie_urls.json') 
+# MOVIE_LIST = unwrap_json('data/movie_data.json')
 
 class Scrapper:
     def __init__(self):
@@ -17,11 +17,13 @@ class Scrapper:
         os.makedirs(self.save_folder, exist_ok=True)
 
     def add_url(self, title):
+        '''
         if title not in URLS:
             print(f"❌ 오류: '{title}'는 지원하지 않는 제목입니다.")
             return
 
         self.urls[title] = URLS[title]
+        '''
         # 영화 제목을 기준으로 폴더 생성
         # os.makedirs(os.path.join(self.save_folder, title), exist_ok=True)
         # print(f"✅ '{title}' URL이 추가되었고, 폴더가 생성되었습니다.")
@@ -66,18 +68,14 @@ class Scrapper:
         print(f'스크랩 완료 후 {self.save_folder} 폴더를 확인하세요.')
         print("지브리 월페이퍼들을 다운로드 받는 중입니다...")
 
-        if movie_list is not None :
+        if movie_list is not None:
             self.urls = movie_list
-            for title, url in movie_list:
-                self.scrap_all_image(title, url)
-                cnt += 1
-                print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
-        else :
-            for title, url in self.urls.items():
-                print(title, url)
-                self.scrap_all_image(title, url)
-                cnt += 1
-                print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
+            
+        for title, url in self.urls:
+            print(title, url)
+            self.scrap_all_image(title, url)
+            cnt += 1
+            print(f'{cnt}/{len(self.urls)}번째 스크랩 완료: {title}')
 
         print("스크랩 완료!")
 
@@ -87,7 +85,7 @@ if __name__ == "__main__":
 
     ghibli_scrapper = Scrapper()
 
-    for url, title in MOVIE_LIST.items():
-        ghibli_scrapper.add_url(title)
+    #for url, title in MOVIE_LIST.items():
+    #    ghibli_scrapper.add_url(title)
 
     ghibli_scrapper.scrap_all_page()
