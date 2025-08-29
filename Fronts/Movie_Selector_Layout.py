@@ -1,18 +1,20 @@
 
 import os
 from Fronts.Maker import make_button, make_title_label
+from Backs.DownloadMovieList import DownloadMovieList
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 
 from data.movie_data import MOVIE_DATA, IMG_DIR
 
+        
 class Movie_Selector_Layout(QVBoxLayout) :
     movie_idx_changed = pyqtSignal(int)
 
-    def __init__(self, parent=None, current_movie_idx = 0):
+    def __init__(self, parent=None, dwn_movie_list : DownloadMovieList = None):
         super().__init__(parent)
-        self.current_movie_idx = current_movie_idx
+        self.dwn_movie_list = dwn_movie_list
         self.init_UI()
 
     def init_UI(self):
@@ -41,7 +43,7 @@ class Movie_Selector_Layout(QVBoxLayout) :
         if not MOVIE_DATA: 
             return
         
-        self.current_movie_idx = (self.current_movie_idx - 1 + len(MOVIE_DATA)) % len(MOVIE_DATA)
+        self.dwn_movie_list.current_movie_index = (self.dwn_movie_list.current_movie_index - 1 + len(MOVIE_DATA)) % len(MOVIE_DATA)
         self.show_current_image()
 
     def _show_next_image(self):
@@ -49,7 +51,7 @@ class Movie_Selector_Layout(QVBoxLayout) :
         if not MOVIE_DATA: 
             return
         
-        self.current_movie_idx = (self.current_movie_idx + 1) % len(MOVIE_DATA)
+        self.dwn_movie_list.current_movie_index = (self.dwn_movie_list.current_movie_index + 1) % len(MOVIE_DATA)
         self.show_current_image()
 
     def show_current_image(self):
@@ -60,11 +62,11 @@ class Movie_Selector_Layout(QVBoxLayout) :
             return
         
         # 부모 클래스에 변수값이 바뀜을 알림
-        self.movie_idx_changed.emit(self.current_movie_idx)
+        # self.movie_idx_changed.emit(self.dwn_movie_list.current_movie_idx)
 
-        image_name = MOVIE_DATA[self.current_movie_idx]['image']
+        image_name = MOVIE_DATA[self.dwn_movie_list.current_movie_index]['image']
         image_path = os.path.join(IMG_DIR, image_name)
-        movie_title = MOVIE_DATA[self.current_movie_idx]['title']
+        movie_title = MOVIE_DATA[self.dwn_movie_list.current_movie_index]['title']
 
         # 영화 제목 라벨 업데이트
         self.title_label.setText(movie_title)
