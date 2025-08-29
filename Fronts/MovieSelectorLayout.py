@@ -9,7 +9,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from data.movie_data import MOVIE_DATA, IMG_DIR
 
         
-class Movie_Selector_Layout(QVBoxLayout) :
+class MovieSelectorLayout(QVBoxLayout) :
     movie_idx_changed = pyqtSignal(int)
 
     def __init__(self, parent=None, dwn_movie_list : DownloadMovieList = None):
@@ -36,7 +36,7 @@ class Movie_Selector_Layout(QVBoxLayout) :
         self.selector_layout.addWidget(self.next_btn)
         self.addLayout(self.selector_layout)
 
-        #self._show_current_image()
+        self.show_current_image()
 
     def _show_prev_image(self):
         """이전 이미지를 표시합니다."""
