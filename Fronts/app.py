@@ -4,6 +4,7 @@ import os
 import json
 from Backs.Scrapper import Scrapper
 from Backs.unwrapper import unwrap_json
+from Backs.DownloadMovieList import DownloadMovieList
 from Fronts.QClickableLabel import QClickableLabel
 from Fronts.Maker import make_button, make_title_label
 from Fronts.Movie_Selector_Layout import Movie_Selector_Layout
@@ -16,6 +17,7 @@ from PyQt6.QtGui import QPixmap, QFont, QCursor
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
 
+
 class Wallpaper_Downloader(QWidget):
     def __init__(self):
         self.SCRAPPER = Scrapper() 
@@ -23,8 +25,9 @@ class Wallpaper_Downloader(QWidget):
 
         IMG_DIR = 'src'
         #DATA_FILE = 'movie_data.json'
-        self.movie_list = []
-        self.current_movie_index = 0
+        self.download_movie_list = DownloadMovieList()
+        # self.movie_list = []
+        # self.current_movie_index = 0
         
         # self._load_movie_data()
         if not MOVIE_DATA:
@@ -34,7 +37,7 @@ class Wallpaper_Downloader(QWidget):
         # self._show_current_image()   
 
     def update_current_index(self, new_idx):
-        self.current_movie_index = new_idx
+        self.download_movie_list.current_movie_index = new_idx
 
     def initUI(self):
         self.setWindowTitle('지브리 월페이퍼 스크래퍼')
@@ -43,7 +46,7 @@ class Wallpaper_Downloader(QWidget):
         main_layout = QVBoxLayout()
 
         # 영화 선택창 레이아웃
-        self.movie_selector_layout = Movie_Selector_Layout(current_movie_idx=self.current_movie_index)
+        self.movie_selector_layout = Movie_Selector_Layout(dwn_movie_list=self.download_movie_list)
         self.movie_selector_layout.movie_idx_changed.connect(self.update_current_index)
         self.movie_selector_layout.show_current_image()
 
@@ -106,7 +109,8 @@ class Wallpaper_Downloader(QWidget):
                 item.widget().deleteLater()
         
         # Add new posters
-        for movie_idx in self.movie_list:
+        # for movie_idx in self.movie_list:
+        for movie_idx in self.download_movie_list.movie_list:
             #poster_label = QLabel()
             poster_label = QClickableLabel(movie_idx=movie_idx)
             poster_label.setToolTip("No Image") # Show movie title on hover
@@ -140,7 +144,7 @@ class Wallpaper_Downloader(QWidget):
             return
 
         movie_idx = clicked_label.idx
-        self.movie_selector_layout.current_movie_idx = self.current_movie_index = movie_idx
+        self.movie_selector_layout.current_movie_idx = self.download_movie_list.current_movie_index = movie_idx
         self.movie_selector_layout.show_current_image()
         # print(f"선택된 포스터의 movie_idx: {movie_idx}")
 
@@ -149,13 +153,13 @@ class Wallpaper_Downloader(QWidget):
         if not MOVIE_DATA: 
             return
         
-        current_image_name = MOVIE_DATA[self.current_movie_index]['image']
-        movie_title = MOVIE_DATA[self.current_movie_index]['title']
+        current_image_name = MOVIE_DATA[self.download_movie_list.current_movie_index]['image']
+        movie_title = MOVIE_DATA[self.download_movie_list.current_movie_index]['title']
         
-        if self.current_movie_index not in self.movie_list:
-            self.movie_list.append(self.current_movie_index)
+        if self.download_movie_list.current_movie_index not in self.download_movie_list.movie_list:
+            self.download_movie_list.movie_list.append(self.download_movie_list.current_movie_index)
             print(f"'{movie_title}'을(를) 저장할 리스트에 추가했습니다.")
-            print("현재 리스트:", self.movie_list)
+            print("현재 리스트:", self.download_movie_list.movie_list)
             self.refresh_poster()
         else:
             print(f"'{movie_title}'은(는) 이미 리스트에 있습니다.")
@@ -165,25 +169,25 @@ class Wallpaper_Downloader(QWidget):
         if not MOVIE_DATA:
             return
         
-        current_image_name = MOVIE_DATA[self.current_movie_index]['image']
-        movie_title = MOVIE_DATA[self.current_movie_index]['title']
+        current_image_name = MOVIE_DATA[self.download_movie_list.current_movie_index]['image']
+        movie_title = MOVIE_DATA[self.download_movie_list.current_movie_index]['title']
 
-        if self.current_movie_index in self.movie_list:
-            self.movie_list.remove(self.current_movie_index)
+        if self.download_movie_list.current_movie_index in self.download_movie_list.movie_list:
+            self.download_movie_list.movie_list.remove(self.download_movie_list.current_movie_index)
             print(f"'{movie_title}'을(를) 리스트에서 삭제했습니다.")
-            print("현재 리스트:", self.movie_list)
+            print("현재 리스트:", self.download_movie_list.movie_list)
             self.refresh_poster()
         else :
             print(f"'{movie_title}'은(는) 이미 리스트에 없습니다.")
     
     def set_movie_list(self, movie_list_data):
         """1. Load images from the movie_list data."""
-        self.movie_list = movie_list_data
+        self.download_movie_list.movie_list = movie_list_data
         self.refresh_posters()
 
     def scrap_all(self):
         title_list = []
-        for idx in self.movie_list :
+        for idx in self.download_movie_list.movie_list :
             title_list.append({MOVIE_DATA[idx]['title'], MOVIE_DATA[idx]['url']})
             
 
